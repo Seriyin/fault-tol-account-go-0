@@ -111,9 +111,9 @@ func handleReply(ch chan reply, out *Writer) {
 	rep := <- ch
 	switch rep.op {
 	case 0:
-		out.WriteString(fmt.Sprintln("bal%d",rep.balance))
+		out.WriteString(fmt.Sprintf("bal %d",rep.balance))
 	case 1:
-		out.WriteString(fmt.Sprintln("mov%t",rep.res))
+		out.WriteString(fmt.Sprintf("mov %t",rep.res))
 	case 255:
 		out.WriteString("unk")
 	}
