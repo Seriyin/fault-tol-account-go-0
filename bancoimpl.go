@@ -1,6 +1,6 @@
 package main
 
-import {
+import (
 	"net"
 	"bufio"
 	"io"
@@ -9,7 +9,7 @@ import {
 	"account"
 	"strings"
 	"strconv"
-}
+)
 
 type reply struct {
 	op byte
