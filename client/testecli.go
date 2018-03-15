@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
-	"os"
 
 	"github.com/Seriyin/lab0-go/bank"
 )
@@ -17,29 +16,19 @@ func main() {
 	tcp := new(net.TCPAddr)
 	tcp.IP = ip
 	tcp.Port = 22556
-	conn, err := net.DialTCP("tcp", nil, tcp)
+	master, err := net.DialTCP("tcp", nil, tcp)
 	if err != nil {
 		panic(err)
 	}
-	master, err := conn.File()
-	conn.Close()
 	defer master.Close()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed opening in blocking mode %s", err)
-	}
 	dec := gob.NewDecoder(master)
 	enc := gob.NewEncoder(master)
 	for i := n; i > 0; i-- {
-		conn, err := net.DialTCP("tcp", nil, tcp)
+		f, err := net.DialTCP("tcp", nil, tcp)
 		if err != nil {
 			// handle error
 			panic(err)
 		}
-		f, err := conn.File()
-		if err != nil {
-			panic(err)
-		}
-		conn.Close()
 		go spamOps(f, ch)
 	}
 	r := int64(0)
@@ -52,7 +41,7 @@ func main() {
 	fmt.Printf("Got %d, Expected %d\n", r, rep.Balance)
 }
 
-func spamOps(conn *os.File, ch chan int64) {
+func spamOps(conn net.Conn, ch chan int64) {
 	defer conn.Close()
 	dec := gob.NewDecoder(conn)
 	enc := gob.NewEncoder(conn)

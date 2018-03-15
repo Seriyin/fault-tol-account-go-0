@@ -39,15 +39,10 @@ func main() {
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed connect %s", err)
 		}
-		f, err := conn.File()
-		conn.Close()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed opening in blocking mode %s", err)
-		}
 		// Handle the connection in a new goroutine.
 		// The loop then returns to accepting, so that
 		// multiple connections may be served concurrently.
-		go handleConn(f, accchan)
+		go handleConn(conn, accchan)
 	}
 
 }
@@ -67,7 +62,7 @@ func accounter(accchan chan interface{}) {
 	}
 }
 
-func handleConn(c *os.File, a chan interface{}) {
+func handleConn(c net.Conn, a chan interface{}) {
 	// Shut down the connection.
 	defer c.Close()
 	dec := gob.NewDecoder(c)
