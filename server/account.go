@@ -2,15 +2,15 @@ package main
 
 //Account is a struct with an integer balance.
 //It implements the Bank interface.
-type Account struct {
+type account struct {
 	bal uint64
 }
 
-func (acc *Account) balance() uint64 {
+func (acc *account) Balance() uint64 {
 	return acc.bal
 }
 
-func (acc *Account) movement(mov int64) bool {
+func (acc *account) Movement(mov int64) bool {
 	res := true
 	if mov > 0 {
 		acc.bal += uint64(mov)
