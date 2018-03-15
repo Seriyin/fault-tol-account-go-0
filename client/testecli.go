@@ -46,7 +46,7 @@ func main() {
 	for ; n > 0; n-- {
 		r += <-ch
 	}
-	rep := bank.Reply{}
+	rep := new(bank.Reply)
 	enc.Encode(bank.Message{Op: 0, Mov: 0})
 	dec.Decode(rep)
 	fmt.Printf("Got %d, Expected %d\n", r, rep.Balance)
@@ -56,7 +56,7 @@ func spamOps(conn *os.File, ch chan int64) {
 	defer conn.Close()
 	dec := gob.NewDecoder(conn)
 	enc := gob.NewEncoder(conn)
-	r := bank.Reply{}
+	r := new(bank.Reply)
 	sum := int64(0)
 	for i := rand.Intn(30000) + 50000; i > 0; i-- {
 		enc.Encode(bank.Message{Op: 1, Mov: rand.Int63n(400) - 200})

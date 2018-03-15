@@ -73,7 +73,7 @@ func handleConn(c *os.File, a chan interface{}) {
 	dec := gob.NewDecoder(c)
 	enc := gob.NewEncoder(c)
 	ch := make(chan bank.Reply, 50)
-	mes := bank.Message{}
+	mes := new(bank.Message)
 	for err := dec.Decode(mes); err != io.EOF; {
 		if err == nil && handleMessage(ch, a, mes) {
 			sendReply(ch, enc)
@@ -83,7 +83,7 @@ func handleConn(c *os.File, a chan interface{}) {
 	}
 }
 
-func handleMessage(ch chan bank.Reply, a chan interface{}, mes bank.Message) (res bool) {
+func handleMessage(ch chan bank.Reply, a chan interface{}, mes *bank.Message) (res bool) {
 	res = true
 	switch mes.Op {
 	case 1:
