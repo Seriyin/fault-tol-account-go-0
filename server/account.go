@@ -1,10 +1,7 @@
 package main
 
-type Interface interface {
-	balance() uint64
-	movement(int64) bool
-}
-
+//Account is a struct with an integer balance.
+//It implements the Bank interface.
 type Account struct {
 	bal uint64
 }
