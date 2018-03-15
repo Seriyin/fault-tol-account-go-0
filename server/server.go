@@ -54,9 +54,9 @@ func accounter(accchan chan interface{}) {
 		m := <-accchan
 		switch m := m.(type) {
 		case bal:
-			m.rep <- bank.Reply{Op: 0, Res: true, Balance: int64(acc.Balance())}
+			m.rep <- bank.Reply{Op: 0, Res: true, Balance: acc.Balance()}
 		case mov:
-			m.rep <- bank.Reply{Op: 1, Res: acc.Movement(m.mov), Balance: m.mov}
+			m.rep <- bank.Reply{Op: 1, Res: acc.Movement(m.mov), Balance: 0}
 		default:
 			fmt.Fprintf(os.Stderr, "Unrecognized message")
 		}

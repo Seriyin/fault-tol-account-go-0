@@ -14,10 +14,10 @@ type bankStub struct {
 	r    *bank.Reply
 }
 
-func (b *bankStub) Balance() uint64 {
+func (b *bankStub) Balance() int64 {
 	b.enc.Encode(bank.Message{Op: 0, Mov: 0})
 	b.dec.Decode(b.r)
-	return uint64(b.r.Balance)
+	return b.r.Balance
 }
 
 func (b *bankStub) Movement(mov int64) bool {

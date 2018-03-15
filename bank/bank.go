@@ -3,7 +3,7 @@ package bank
 //Bank is a simple one account interface.
 //It has a movement and a balance operation.
 type Bank interface {
-	Balance() uint64
+	Balance() int64
 	Movement(int64) bool
 }
 

@@ -30,7 +30,7 @@ func spamOps(bf *bankFactory, ch chan int64, index int) {
 	b := bf.NewBank()
 	sum := int64(0)
 	r := rand.Intn(30000) + 50000
-	fmt.Printf("%d Spammer will spam %d iterations", index, r)
+	fmt.Printf("%d Spammer will spam %d iterations\n", index, r)
 	for i := 0; i < r; i++ {
 		mov := rand.Int63n(400) - 200
 		if b.Movement(mov) {
@@ -39,7 +39,7 @@ func spamOps(bf *bankFactory, ch chan int64, index int) {
 			fmt.Printf("Rejected %d\n", mov)
 		}
 	}
-	fmt.Printf("%d Spammer got %d", index, sum)
+	fmt.Printf("%d Spammer got %d\n", index, sum)
 	ch <- sum
 	close(ch)
 }
