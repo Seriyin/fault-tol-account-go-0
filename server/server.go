@@ -48,14 +48,15 @@ func main() {
 }
 
 func accounter(accchan chan interface{}) {
-	acc := new(Account)
+	var acc bank.Bank
+	acc = new(account)
 	for {
 		m := <-accchan
 		switch m := m.(type) {
 		case bal:
-			m.rep <- bank.Reply{Op: 0, Res: true, Balance: int64(acc.balance())}
+			m.rep <- bank.Reply{Op: 0, Res: true, Balance: int64(acc.Balance())}
 		case mov:
-			m.rep <- bank.Reply{Op: 1, Res: acc.movement(m.mov), Balance: m.mov}
+			m.rep <- bank.Reply{Op: 1, Res: acc.Movement(m.mov), Balance: m.mov}
 		default:
 			fmt.Fprintf(os.Stderr, "Unrecognized message")
 		}
