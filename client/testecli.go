@@ -10,8 +10,11 @@ import (
 )
 
 func main() {
-	ch := make(chan int64, 200)
 	n := rand.Intn(12) + 4
+	ch := make([]chan int64, n, n)
+	for i := range ch {
+		ch[i] = make(chan int64, 1)
+	}
 	ip := net.IPv4(127, 0, 0, 1)
 	tcp := new(net.TCPAddr)
 	tcp.IP = ip
@@ -23,17 +26,19 @@ func main() {
 	defer master.Close()
 	dec := gob.NewDecoder(master)
 	enc := gob.NewEncoder(master)
-	for i := n; i > 0; i-- {
+	for i := 0; i < n; i++ {
 		f, err := net.DialTCP("tcp", nil, tcp)
 		if err != nil {
 			// handle error
 			panic(err)
 		}
-		go spamOps(f, ch)
+		go spamOps(f, ch[i])
 	}
 	r := int64(0)
-	for ; n > 0; n-- {
-		r += <-ch
+	for _, c := range ch {
+		for i := range c {
+			r += i
+		}
 	}
 	rep := new(bank.Reply)
 	enc.Encode(bank.Message{Op: 0, Mov: 0})
@@ -50,6 +55,12 @@ func spamOps(conn net.Conn, ch chan int64) {
 	for i := rand.Intn(30000) + 50000; i > 0; i-- {
 		enc.Encode(bank.Message{Op: 1, Mov: rand.Int63n(400) - 200})
 		dec.Decode(r)
-		sum += r.Balance
+		if r.Res {
+			sum += r.Balance
+		} else {
+			fmt.Printf("Rejected %d\n", r.Balance)
+		}
 	}
+	ch <- sum
+	close(ch)
 }

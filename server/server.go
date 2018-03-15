@@ -65,6 +65,7 @@ func accounter(accchan chan interface{}) {
 func handleConn(c net.Conn, a chan interface{}) {
 	// Shut down the connection.
 	defer c.Close()
+	fmt.Println("Handling Connection")
 	dec := gob.NewDecoder(c)
 	enc := gob.NewEncoder(c)
 	ch := make(chan bank.Reply, 50)
