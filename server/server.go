@@ -7,7 +7,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/Seriyin/lab0-go/bank"
+	"../bank"
 )
 
 type mov struct {
@@ -49,14 +49,14 @@ func main() {
 
 func accounter(accchan chan interface{}) {
 	var acc bank.Bank
-	acc = new(account)
+	acc = bank.NewAccount()
 	for {
 		m := <-accchan
 		switch m := m.(type) {
 		case bal:
 			m.rep <- bank.Reply{Op: 0, Res: true, Balance: acc.Balance()}
 		case mov:
-			m.rep <- bank.Reply{Op: 1, Res: acc.Movement(m.mov), Balance: 0}
+			m.rep <- bank.Reply{Op: 1, Res: acc.Movement(m.mov), Balance: m.mov}
 		default:
 			fmt.Fprintf(os.Stderr, "Unrecognized message")
 		}
@@ -67,17 +67,23 @@ func handleConn(c net.Conn, a chan interface{}) {
 	// Shut down the connection.
 	defer c.Close()
 	fmt.Println("Handling Connection")
+	ch := make(chan bank.Reply, 50)
 	dec := gob.NewDecoder(c)
 	enc := gob.NewEncoder(c)
-	ch := make(chan bank.Reply, 50)
-	mes := new(bank.Message)
-	for err := dec.Decode(mes); err != io.EOF; {
-		if err == nil && handleMessage(ch, a, mes) {
-			sendReply(ch, enc)
-		} else if err != nil {
-			fmt.Fprintf(os.Stderr, "Error decoding: %s", err)
+	go sendReply(ch, enc)
+	var err error
+	for err == nil {
+		mes := new(bank.Message)
+		err = dec.Decode(mes)
+		if err == nil {
+			if !handleMessage(ch, a, mes) {
+				fmt.Fprintf(os.Stderr, "Error decoding: default case\n")
+			}
+		} else if err != io.EOF && err != nil {
+			fmt.Fprintf(os.Stderr, "Error decoding: %s\n", err)
 		}
 	}
+	close(ch)
 }
 
 func handleMessage(ch chan bank.Reply, a chan interface{}, mes *bank.Message) (res bool) {
@@ -94,6 +100,7 @@ func handleMessage(ch chan bank.Reply, a chan interface{}, mes *bank.Message) (r
 }
 
 func sendReply(ch chan bank.Reply, out *gob.Encoder) {
-	rep := <-ch
-	out.Encode(rep)
+	for rep := range ch {
+		out.Encode(rep)
+	}
 }
