@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"net"
 
-	"github.com/Seriyin/lab0-go/bank"
+	"../bank"
 )
 
 type bankFactory struct {
@@ -32,7 +32,7 @@ func (bf *bankFactory) NewBank() bank.Bank {
 	enc := gob.NewEncoder(master)
 	dec := gob.NewDecoder(master)
 	bf.conns = append(bf.conns, master)
-	return &bankStub{conn: master, enc: enc, dec: dec, r: new(bank.Reply)}
+	return &bankStub{conn: master, enc: enc, dec: dec}
 }
 
 // CloseBanks will close all banks returned via NewBank.
